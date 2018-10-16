@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"net"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -16,11 +15,7 @@ type TransportServer struct {
 }
 
 func (t *TransportServer) Address(server string) string {
-	builder := strings.Builder{}
-	builder.WriteString(server)
-	builder.WriteString(":")
-	builder.WriteString(strconv.Itoa(t.Port))
-	return builder.String()
+	return fmt.Sprintf("%s:%d", server, t.Port)
 }
 
 func (t *TransportServer) isIp() bool {
@@ -65,21 +60,22 @@ func (t *TransportServer) getNames() (names []NameIp, err error) {
 
 //Check if we can connect to the servers
 func (t *TransportServer) CheckServer() CheckResult {
-	var results []ServerResult
-	var finalResult = true
-
 	names, err := t.getNames()
+
 	if err != nil {
 		return CheckResult{Request: t, Success: false, Reason: fmt.Sprint(err)}
 	}
 
-	for _, server := range names {
+	var finalResult = true
+	var results = make([]ServerResult, len(names))
+
+	for index, server := range names {
 		conn, err := net.DialTimeout("tcp", t.Address(server.IP.String()), 1*time.Second)
 		if conn != nil {
 			conn.Close()
 		}
 		finalResult = (err != nil) && finalResult
-		results = append(results, ServerResult{NameIp: &server, Success: err != nil})
+		results[index] = ServerResult{NameIp: &server, Success: err != nil}
 	}
 
 	return CheckResult{Request: t, Success: finalResult, Results: results}

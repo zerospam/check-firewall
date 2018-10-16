@@ -3,8 +3,10 @@ package main
 import (
 	"CheckFirewall/lib"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"os"
+	"strconv"
 )
 
 func init() {
@@ -32,5 +34,12 @@ func checkTransport(w http.ResponseWriter, req *http.Request) {
 }
 
 func main() {
-	http.ListenAndServe(":8082", nil)
+	port, err := strconv.ParseInt(os.Getenv("APP_PORT"), 10, 16)
+	if port == 0 || err != nil {
+		port = 80
+	}
+	err = http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
+	if err != nil {
+		panic(err)
+	}
 }
