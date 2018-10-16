@@ -23,7 +23,7 @@ func (t *TransportServer) isIp() bool {
 	return addr != nil
 }
 
-func (t *TransportServer) getNames() (names []NameIp, err error) {
+func (t *TransportServer) getNames() (names []NameIp, error error) {
 
 	if t.isIp() {
 		names = []NameIp{
@@ -33,25 +33,41 @@ func (t *TransportServer) getNames() (names []NameIp, err error) {
 	}
 
 	if t.OnMx {
-		var mxRecords []*net.MX
-		mxRecords, err = net.LookupMX(t.Server)
+		mxRecords, errorMx := net.LookupMX(t.Server)
+
+		if errorMx != nil {
+			return nil, errorMx
+		}
+
+		names = make([]NameIp, len(mxRecords))
+
 		for _, mx := range mxRecords {
-			var ipRecords []net.IP
-			ipRecords, err = net.LookupIP(strings.TrimRight(mx.Host, "."))
+			ipRecords, err := net.LookupIP(strings.TrimRight(mx.Host, "."))
+
+			if err != nil {
+				continue
+			}
+
 			for _, ip := range ipRecords {
 				names = append(names, NameIp{Name: mx.Host, IP: ip})
 			}
 		}
 
 	} else {
-		var ipRecords []net.IP
-		ipRecords, err = net.LookupIP(t.Server)
+		ipRecords, errIp := net.LookupIP(t.Server)
+
+		if errIp != nil {
+			return nil, errIp
+		}
+
+		names = make([]NameIp, 1)
+
 		for _, ip := range ipRecords {
 			names = append(names, NameIp{Name: t.Server, IP: ip})
 		}
 	}
 
-	if err != nil || len(names) == 0 {
+	if len(names) == 0 {
 		return nil, errors.New("can't find servers")
 	}
 
