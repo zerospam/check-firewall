@@ -4,6 +4,7 @@ import (
 	"CheckFirewall/lib"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -16,20 +17,23 @@ func init() {
 func checkTransport(w http.ResponseWriter, req *http.Request) {
 	var transportServer lib.TransportServer
 
-	if req.Body == nil {
-		http.Error(w, "Please send a request body", 400)
+	if req.Header.Get("Authorization") != os.Getenv("SHARED_KEY") {
+		http.Error(w, "Wrong Key sent.", 402)
+		log.Printf("[%s] - %s (%s:%d) - %v\n", req.RemoteAddr, req.Method, transportServer.Server, transportServer.Port, "REJECT")
 		return
 	}
 
-	if req.Header.Get("Authorization") != os.Getenv("SHARED_KEY") {
-		http.Error(w, "Wrong Key sent.", 402)
+	if req.Body == nil {
+		http.Error(w, "Please send a request body", 400)
 		return
 	}
 
 	json.NewDecoder(req.Body).Decode(&transportServer)
 
 	w.Header().Add("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(transportServer.CheckServer())
+	result := transportServer.CheckServer()
+	json.NewEncoder(w).Encode(result)
+	log.Printf("[%s] - %s (%s:%d) - %v\n", req.RemoteAddr, req.Method, transportServer.Server, transportServer.Port, result.Success)
 
 }
 
