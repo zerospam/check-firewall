@@ -32,7 +32,7 @@ func (t *TransportServer) getNames() (names []NameIp, err error) {
 
 	if t.isIp() {
 		names = []NameIp{
-			NameIp{Name: t.Server, IP: net.ParseIP(t.Server)},
+			{Name: t.Server, IP: net.ParseIP(t.Server)},
 		}
 		return names, nil
 	}
