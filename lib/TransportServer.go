@@ -34,31 +34,32 @@ func (t *TransportServer) getNames() (names []NameIp, err error) {
 		names = []NameIp{
 			NameIp{Name: t.Server, IP: net.ParseIP(t.Server)},
 		}
-	} else {
+		return names, nil
+	}
 
-		if t.OnMx {
-			var mxRecords []*net.MX
-			mxRecords, err = net.LookupMX(t.Server)
-			for _, mx := range mxRecords {
-				var ipRecords []net.IP
-				ipRecords, err = net.LookupIP(strings.TrimRight(mx.Host, "."))
-				for _, ip := range ipRecords {
-					names = append(names, NameIp{Name: mx.Host, IP: ip})
-				}
-			}
-
-		} else {
+	if t.OnMx {
+		var mxRecords []*net.MX
+		mxRecords, err = net.LookupMX(t.Server)
+		for _, mx := range mxRecords {
 			var ipRecords []net.IP
-			ipRecords, err = net.LookupIP(t.Server)
+			ipRecords, err = net.LookupIP(strings.TrimRight(mx.Host, "."))
 			for _, ip := range ipRecords {
-				names = append(names, NameIp{Name: t.Server, IP: ip})
+				names = append(names, NameIp{Name: mx.Host, IP: ip})
 			}
 		}
 
-		if err != nil || len(names) == 0 {
-			return nil, errors.New("can't find servers")
+	} else {
+		var ipRecords []net.IP
+		ipRecords, err = net.LookupIP(t.Server)
+		for _, ip := range ipRecords {
+			names = append(names, NameIp{Name: t.Server, IP: ip})
 		}
 	}
+
+	if err != nil || len(names) == 0 {
+		return nil, errors.New("can't find servers")
+	}
+
 	return names, nil
 }
 
