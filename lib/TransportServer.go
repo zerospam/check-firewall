@@ -23,10 +23,10 @@ func (t *TransportServer) isIp() bool {
 	return addr != nil
 }
 
-func (t *TransportServer) getNames() (names []NameIp, error error) {
+func (t *TransportServer) getNames() (names []*NameIp, error error) {
 
 	if t.isIp() {
-		names = []NameIp{
+		names = []*NameIp{
 			{Name: t.Server, IP: net.ParseIP(t.Server)},
 		}
 		return names, nil
@@ -39,8 +39,6 @@ func (t *TransportServer) getNames() (names []NameIp, error error) {
 			return nil, errorMx
 		}
 
-		names = make([]NameIp, len(mxRecords))
-
 		for _, mx := range mxRecords {
 			ipRecords, err := net.LookupIP(strings.TrimRight(mx.Host, "."))
 
@@ -49,7 +47,7 @@ func (t *TransportServer) getNames() (names []NameIp, error error) {
 			}
 
 			for _, ip := range ipRecords {
-				names = append(names, NameIp{Name: mx.Host, IP: ip})
+				names = append(names, &NameIp{Name: mx.Host, IP: ip})
 			}
 		}
 
@@ -60,10 +58,8 @@ func (t *TransportServer) getNames() (names []NameIp, error error) {
 			return nil, errIp
 		}
 
-		names = make([]NameIp, 1)
-
 		for _, ip := range ipRecords {
-			names = append(names, NameIp{Name: t.Server, IP: ip})
+			names = append(names, &NameIp{Name: t.Server, IP: ip})
 		}
 	}
 
@@ -91,7 +87,7 @@ func (t *TransportServer) CheckServer() CheckResult {
 			conn.Close()
 		}
 		finalResult = (err != nil) && finalResult
-		results[index] = ServerResult{NameIp: &server, Success: err != nil}
+		results[index] = ServerResult{NameIp: server, Success: err != nil}
 	}
 
 	return CheckResult{Request: t, Success: finalResult, Results: results}
