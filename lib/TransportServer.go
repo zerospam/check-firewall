@@ -74,7 +74,7 @@ func (t *TransportServer) CheckServer() CheckResult {
 	}
 
 	for _, server := range names {
-		conn, err := net.DialTimeout("tcp", t.Address(server.IP.String()), 2*time.Second)
+		conn, err := net.DialTimeout("tcp", t.Address(server.IP.String()), 1*time.Second)
 		if conn != nil {
 			conn.Close()
 		}
