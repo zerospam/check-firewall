@@ -10,12 +10,18 @@ An unaddressable server is considered a success.
 ## Data
 ```json
 {
-  "server": "example.com", // Server to check
-  "port": 25,              // On which port
-  "mx": false              // Intead of resolving the IP, resolve the MX of the server first then check IPs
+  "server": "example.com",
+  "port": 25,
+  "mx": false
 }
 ```
 
+
+| Key    | Explanation                                                                    |
+|--------|--------------------------------------------------------------------------------|
+| server | Server to check                                                                |
+| port   | Port to use to attempt the connection                                          |
+| mx     | Instead of resolving the IP, resolve the MX of the server first then check IPs |
 ## Result
 ### Success
 ```json
