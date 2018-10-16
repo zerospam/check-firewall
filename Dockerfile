@@ -1,11 +1,14 @@
-FROM golang:1.10-alpine
+FROM golang:1.11.1-alpine
 
-COPY . /go/src/github.com/zerospam/checkfirewall
-WORKDIR /go/src/github.com/zerospam/checkfirewall
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o firewall-checker .
+ARG APP_PATH="/go/src/CheckFirewall"
+ARG APP_NAME="firewallChecker"
+
+COPY . $APP_PATH
+WORKDIR $APP_PATH
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o $APP_NAME
 
 FROM scratch
 
-COPY --from=0 /go/src/github.com/zerospam/checkfirewall/firewall-checker /firewall-checker
+COPY --from=0 ${APP_PATH}/$APP_NAME /$APP_NAME
 
-CMD ["/firewall-checker"]
+CMD ["/$APP_NAME"]
