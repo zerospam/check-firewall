@@ -7,6 +7,13 @@ In our use-case, we want the tested server to **not** be accessible from this ap
 
 An unaddressable server is considered a success.
 
+## Env
+
+| Key        | Requirement           | Explanation                                                                                   |
+|------------|-----------------------|-----------------------------------------------------------------------------------------------|
+| SHARED_KEY | mandatory             | Secret shared between main app and this one. (Needs to be sent in the header *Authorization*) |
+| APP_PORT   | optional (default 80) | Port used for the application                                                                 |
+
 ## Data
 ```json
 {
