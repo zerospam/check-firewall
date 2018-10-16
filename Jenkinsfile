@@ -22,7 +22,6 @@ podTemplate(label: label, inheritFrom: 'default', containers: [
                     docker.withRegistry('https://index.docker.io/v1/', 'docker-hub') {
                             builtImage.push('latest')
                             builtImage.push("${tag}")
-                            builtImage.push("${gitInfo.GIT_COMMIT}")
                     }
                 } // stage
             } // if master branch
