@@ -6,8 +6,7 @@ FROM golang:1.11.1-alpine as builder
 ARG APP_PATH
 ARG APP_NAME
 
-RUN sed -i -e 's/dl-cdn/dl-4/' /etc/apk/repositories \
-    && apk add \
+RUN apk add \
     --update \
     --no-cache \
     curl \
