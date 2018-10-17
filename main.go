@@ -6,7 +6,6 @@ import (
 	"github.com/zerospam/check-firewall/lib/Handlers"
 	"net/http"
 	"os"
-	"strconv"
 )
 
 func init() {
