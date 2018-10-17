@@ -8,10 +8,20 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 )
 
 func init() {
 	http.HandleFunc("/check", checkTransport)
+}
+
+func getRequestIp(req *http.Request) string {
+	if header := req.Header.Get("X-Forwarded-For"); header != "" {
+		exploded := strings.Split(header, ",")
+		return strings.Trim(exploded[len(exploded)-1], " ")
+	}
+
+	return req.RemoteAddr
 }
 
 func checkTransport(w http.ResponseWriter, req *http.Request) {
@@ -33,7 +43,7 @@ func checkTransport(w http.ResponseWriter, req *http.Request) {
 	w.Header().Add("Content-Type", "application/json")
 	result := transportServer.CheckServer()
 	json.NewEncoder(w).Encode(result)
-	log.Printf("[%s] - %s (%s:%d) - %v\n", req.RemoteAddr, req.Method, transportServer.Server, transportServer.Port, result.Success)
+	log.Printf("[%s] - %s (%s:%d) - %v\n", getRequestIp(req), req.Method, transportServer.Server, transportServer.Port, result.Success)
 
 }
 
