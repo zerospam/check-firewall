@@ -6,11 +6,7 @@ FROM golang:1.11.1-alpine as builder
 ARG APP_PATH
 ARG APP_NAME
 
-RUN apk add \
-    --update \
-    --no-cache \
-    curl \
-    && curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+RUN wget -O - https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 
 COPY . $APP_PATH
 WORKDIR $APP_PATH
