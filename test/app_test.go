@@ -1,6 +1,7 @@
 package test
 
 import (
+	"github.com/stretchr/testify/assert"
 	"github.com/zerospam/check-firewall/lib"
 	"github.com/zerospam/check-firewall/lib/Handlers"
 	"net"
@@ -53,10 +54,14 @@ func TestHealthz(t *testing.T) {
 }
 
 func TestFirewalled(t *testing.T) {
-	server := lib.TransportServer{Server: "localhost", Port: 1, OnMx: false}
-	if result := server.CheckServer(); !result.Success {
-		t.Error("Expected to have localhost:25 not reachable")
-	}
+	port := 1
+	server := lib.TransportServer{Server: "localhost", Port: port, OnMx: false}
+
+	result := server.CheckServer()
+
+	assert.True(t, result.Success, "Expected to have localhost:%d unreachable", port)
+	assert.True(t, result.Results[0].Success, "Expected to have localhost:%d unreachable", port)
+	assert.Equal(t, net.ParseIP("127.0.0.1"), result.Results[0].IP, "Expected to have localhost:%d unreachable", port)
 }
 
 func TestNotFirewalled(t *testing.T) {
@@ -67,7 +72,10 @@ func TestNotFirewalled(t *testing.T) {
 
 	defer listener.Close()
 	server := lib.TransportServer{Server: "localhost", Port: port, OnMx: false}
-	if result := server.CheckServer(); result.Success {
-		t.Errorf("Expected to have localhost:%d reachable", port)
-	}
+	result := server.CheckServer()
+
+	assert.False(t, result.Success, "Expected to have localhost:%d reachable", port)
+	assert.False(t, result.Results[0].Success, "Expected to have localhost:%d reachable", port)
+	assert.Equal(t, net.ParseIP("127.0.0.1"), result.Results[0].IP, "Expected to have localhost:%d unreachable", port)
+
 }

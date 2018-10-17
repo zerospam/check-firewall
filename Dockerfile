@@ -17,9 +17,11 @@ RUN sed -i -e 's/dl-cdn/dl-4/' /etc/apk/repositories && \
 
 COPY . $APP_PATH
 WORKDIR $APP_PATH
+
 RUN dep ensure \
-    && go test -v ${APP_PACKAGE}/test \
-    && go build -a -installsuffix cgo -o $APP_NAME
+    && go test -v ${APP_PACKAGE}/test
+
+RUN go build -a -installsuffix cgo -o $APP_NAME
 
 FROM scratch
 
