@@ -28,3 +28,7 @@
 [prune]
   go-tests = true
   unused-packages = true
+
+[metadata.heroku]
+  root-package = "github.com/zerospam/check-firewall"
+  go-version = "1.11.1"

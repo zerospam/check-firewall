@@ -1,9 +1,9 @@
 package main
 
 import (
-	"CheckFirewall/lib"
 	"encoding/json"
 	"fmt"
+	"github.com/zerospam/check-firewall/lib"
 	"log"
 	"net/http"
 	"os"
