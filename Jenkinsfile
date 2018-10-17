@@ -1,10 +1,5 @@
 def label = "replicator-${UUID.randomUUID().toString()}"
-podTemplate(label: label, inheritFrom: 'default', containers: [
-    containerTemplate(name: 'docker', image: 'docker', ttyEnabled: true, command: 'cat')
- ],
-  volumes: [
-    hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock'),
-  ]) {
+podTemplate(label: label, inheritFrom: 'docker') {
     def image="zerospam/check-firewall"
     def tag = "1.0"
     def builtImage = null
