@@ -7,6 +7,8 @@ ARG APP_PATH
 ARG APP_NAME
 
 RUN wget -O - https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+RUN sed -i -e 's/dl-cdn/dl-4/' /etc/apk/repositories && \
+    apk --update --no-cache add git
 
 COPY . $APP_PATH
 WORKDIR $APP_PATH
