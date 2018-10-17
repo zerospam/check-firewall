@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	_ "github.com/heroku/x/hmetrics/onload"
 	"github.com/zerospam/check-firewall/lib"
 	"log"
 	"net/http"
