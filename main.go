@@ -15,11 +15,11 @@ func init() {
 }
 
 func main() {
-	port, err := strconv.ParseInt(os.Getenv("PORT"), 10, 16)
-	if port == 0 || err != nil {
-		port = 80
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "80"
 	}
-	err = http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
+	err := http.ListenAndServe(fmt.Sprintf(":%s", port), nil)
 	if err != nil {
 		panic(err)
 	}
