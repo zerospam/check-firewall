@@ -1,8 +1,13 @@
-ARG APP_PATH="/go/src/github.com/zerospam/check-firewall"
+ARG APP_PACKAGE="github.com/zerospam/check-firewall"
+ARG APP_PATH="/go/src/${APP_PACKAGE}"
 ARG APP_NAME="firewallChecker"
 
 FROM golang:1.11.1-alpine as builder
 
+ENV CGO_ENABLED=0
+ENV GOOS=linux
+
+ARG APP_PACKAGE
 ARG APP_PATH
 ARG APP_NAME
 
@@ -13,7 +18,8 @@ RUN sed -i -e 's/dl-cdn/dl-4/' /etc/apk/repositories && \
 COPY . $APP_PATH
 WORKDIR $APP_PATH
 RUN dep ensure \
-    && CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o $APP_NAME
+    && go test -v ${APP_PACKAGE}/test \
+    && go build -a -installsuffix cgo -o $APP_NAME
 
 FROM scratch
 

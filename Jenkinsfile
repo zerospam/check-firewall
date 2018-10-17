@@ -7,7 +7,7 @@ podTemplate(label: label, inheritFrom: 'docker') {
     node (label) {
         gitInfo = checkout scm
          container('docker') {
-            stage('docker build') {
+            stage('Build & Test') {
                builtImage = docker.build("${image}:${env.BUILD_ID}")
             }
 
