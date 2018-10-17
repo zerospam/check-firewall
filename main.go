@@ -38,7 +38,7 @@ func checkTransport(w http.ResponseWriter, req *http.Request) {
 }
 
 func main() {
-	port, err := strconv.ParseInt(os.Getenv("APP_PORT"), 10, 16)
+	port, err := strconv.ParseInt(os.Getenv("PORT"), 10, 16)
 	if port == 0 || err != nil {
 		port = 80
 	}

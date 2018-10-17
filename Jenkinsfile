@@ -6,7 +6,7 @@ podTemplate(label: label, inheritFrom: 'default', containers: [
     hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock'),
   ]) {
     def image="zerospam/check-firewall"
-    def tag = "0.2"
+    def tag = "1.0"
     def builtImage = null
 
     node (label) {
