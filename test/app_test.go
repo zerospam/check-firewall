@@ -57,7 +57,7 @@ func TestFirewalled(t *testing.T) {
 	port := 1
 	server := lib.TransportServer{Server: "localhost", Port: port, OnMx: false}
 
-	result := server.CheckServer()
+	result := server.CheckServer(false)
 
 	assert.True(t, result.Success, "Expected to have localhost:%d unreachable", port)
 	assert.True(t, result.Results[0].Success, "Expected to have localhost:%d unreachable", port)
@@ -72,7 +72,7 @@ func TestNotFirewalled(t *testing.T) {
 
 	defer listener.Close()
 	server := lib.TransportServer{Server: "localhost", Port: port, OnMx: false}
-	result := server.CheckServer()
+	result := server.CheckServer(false)
 
 	assert.False(t, result.Success, "Expected to have localhost:%d reachable", port)
 	assert.False(t, result.Results[0].Success, "Expected to have localhost:%d reachable", port)

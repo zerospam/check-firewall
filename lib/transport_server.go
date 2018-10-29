@@ -1,17 +1,25 @@
 package lib
 
 import (
+	"crypto/tls"
 	"errors"
 	"fmt"
+	"github.com/zerospam/check-firewall/lib/common"
+	"github.com/zerospam/check-firewall/lib/tlsgenerator"
+	"log"
 	"net"
+	"net/smtp"
+	"os"
 	"strings"
 	"time"
 )
 
 type TransportServer struct {
-	Server string `json:"server"`
-	Port   int    `json:"port"`
-	OnMx   bool   `json:"mx"`
+	Server       string `json:"server"`
+	Port         int    `json:"port"`
+	OnMx         bool   `json:"mx"`
+	TestEmail    string `json:"test_email"`
+	tlsGenerator *tlsgenerator.CertificateGenerator
 }
 
 func (t *TransportServer) Address(server string) string {
@@ -21,6 +29,14 @@ func (t *TransportServer) Address(server string) string {
 func (t *TransportServer) isIp() bool {
 	addr := net.ParseIP(t.Server)
 	return addr != nil
+}
+
+func (t *TransportServer) getClientTLSConfig(commonName string) *tls.Config {
+	if t.tlsGenerator == nil {
+		t.tlsGenerator = tlsgenerator.NewClient(time.Now(), 365*24*time.Hour)
+	}
+
+	return t.tlsGenerator.GetTlsClientConfig(commonName)
 }
 
 func (t *TransportServer) getNames() (names []*NameIp, error error) {
@@ -71,7 +87,7 @@ func (t *TransportServer) getNames() (names []*NameIp, error error) {
 }
 
 //Check if we can connect to the servers
-func (t *TransportServer) CheckServer() CheckResult {
+func (t *TransportServer) CheckServer(checkSMTP bool) CheckResult {
 	names, err := t.getNames()
 
 	if err != nil {
@@ -83,12 +99,57 @@ func (t *TransportServer) CheckServer() CheckResult {
 
 	for index, server := range names {
 		conn, err := net.DialTimeout("tcp", t.Address(server.IP.String()), 1*time.Second)
+		currentSuccess := err != nil
+		var msg string
 		if conn != nil {
+			if checkSMTP {
+				currentSuccess, msg = t.checkSMTP(conn)
+			}
 			conn.Close()
 		}
-		finalResult = (err != nil) && finalResult
-		results[index] = ServerResult{NameIp: server, Success: err != nil}
+		finalResult = currentSuccess && finalResult
+		results[index] = ServerResult{NameIp: server, Success: currentSuccess, Message: msg}
 	}
 
 	return CheckResult{Request: t, Success: finalResult, Results: results}
+}
+
+func (t *TransportServer) checkSMTP(conn net.Conn) (bool, string) {
+
+	hostname, err := os.Hostname()
+	if err != nil {
+		panic(err)
+	}
+
+	client, err := smtp.NewClient(conn, t.Server)
+	if err != nil {
+		return true, "Stop at INIT CONN"
+	}
+
+	defer client.Quit()
+	defer client.Close()
+
+	if err = client.Hello(hostname); err != nil {
+		return true, "Stop at EHLO"
+	}
+
+	if tlsSupport, _ := client.Extension("STARTTLS"); tlsSupport {
+		tlsConfig := t.getClientTLSConfig(common.GetVars().SmtpCN)
+		tlsConfig.ServerName = t.Server
+		err = client.StartTLS(tlsConfig)
+		if err != nil {
+			log.Printf("Couldn't start TLS transaction: %s", err)
+			return true, "Can't connect TLS"
+		}
+	}
+
+	if err = client.Mail(common.GetVars().SmtpMailFrom.String()); err != nil {
+		return true, "Stop at MAIL FROM"
+	}
+
+	if err = client.Rcpt(t.TestEmail); err != nil {
+		return true, "Stop at RCPT TO"
+	}
+
+	return false, "Can start a SMTP Transaction"
 }

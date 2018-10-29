@@ -1,6 +1,7 @@
 package common
 
 import (
+	"fmt"
 	"net/mail"
 	"os"
 	"strconv"
@@ -42,6 +43,11 @@ func GetVars() *Env {
 
 		var emailFromAddress *mail.Address
 		emailFrom := os.Getenv("SMTP_FROM")
+
+		if emailFrom == "" {
+			emailFrom = fmt.Sprintf("%s@%s", "local", hostname)
+		}
+
 		emailFromAddress, err = mail.ParseAddress(emailFrom)
 		if err != nil {
 			panic(err)
