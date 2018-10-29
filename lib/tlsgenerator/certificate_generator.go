@@ -1,4 +1,4 @@
-package tls
+package tlsgenerator
 
 import (
 	"crypto/ecdsa"
