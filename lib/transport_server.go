@@ -133,23 +133,28 @@ func (t *TransportServer) checkSMTP(conn net.Conn) (bool, string) {
 		return true, "Stop at EHLO"
 	}
 
+	var tlsVersion = "None"
+
 	if tlsSupport, _ := client.Extension("STARTTLS"); tlsSupport {
 		tlsConfig := t.getClientTLSConfig(common.GetVars().SmtpCN)
 		tlsConfig.ServerName = t.Server
+		tlsConfig.MinVersion = tls.VersionTLS11
 		err = client.StartTLS(tlsConfig)
 		if err != nil {
 			log.Printf("Couldn't start TLS transaction: %s", err)
 			return true, fmt.Sprintf("Couldn't start TLS transaction: %s", err)
 		}
+		state, _ := client.TLSConnectionState()
+		tlsVersion = tlsgenerator.TlsVersion(state)
 	}
 
 	if err = client.Mail(common.GetVars().SmtpMailFrom.String()); err != nil {
-		return true, "Stop at MAIL FROM"
+		return true, fmt.Sprintf("Stop at MAIL FROM (TLS: %s)", tlsVersion)
 	}
 
 	if err = client.Rcpt(t.TestEmail); err != nil {
-		return true, "Stop at RCPT TO"
+		return true, fmt.Sprintf("Stop at RCPT TO (TLS: %s)", tlsVersion)
 	}
 
-	return false, "Can start a SMTP Transaction"
+	return false, fmt.Sprintf("Can start a SMTP Transaction (TLS: %s)", tlsVersion)
 }
