@@ -21,6 +21,29 @@ type CertificateGenerator struct {
 	RootKeyPair tls.Certificate
 }
 
+//Generate a configuration to use as Client authentication
+func (cg *CertificateGenerator) GetTlsClientConfig(commonName string) *tls.Config {
+	return &tls.Config{
+		Certificates: []tls.Certificate{cg.GenerateClient(commonName)},
+		RootCAs:      cg.GetRootCertificates(),
+	}
+}
+
+//Get the generated root certificate
+func (cg *CertificateGenerator) GetRootCertificates() *x509.CertPool {
+	pool := x509.NewCertPool()
+
+	for _, cert := range cg.RootKeyPair.Certificate {
+		certificate, err := x509.ParseCertificate(cert)
+		if err != nil {
+			log.Fatalf("Failed to parse Root Cert: %s", err)
+		}
+		pool.AddCert(certificate)
+	}
+
+	return pool
+}
+
 func (cg *CertificateGenerator) NewClient(notBefore time.Time, ttl time.Duration) *CertificateGenerator {
 	client := &CertificateGenerator{
 		notBefore: notBefore,
