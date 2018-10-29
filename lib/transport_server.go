@@ -139,7 +139,7 @@ func (t *TransportServer) checkSMTP(conn net.Conn) (bool, string) {
 		err = client.StartTLS(tlsConfig)
 		if err != nil {
 			log.Printf("Couldn't start TLS transaction: %s", err)
-			return true, "Can't connect TLS"
+			return true, fmt.Sprintf("Couldn't start TLS transaction: %s", err)
 		}
 	}
 

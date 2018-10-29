@@ -23,10 +23,13 @@ type CertificateGenerator struct {
 
 //Generate a configuration to use as Client authentication
 func (cg *CertificateGenerator) GetTlsClientConfig(commonName string) *tls.Config {
-	return &tls.Config{
+	tlsConfig := &tls.Config{
 		Certificates: []tls.Certificate{cg.GenerateClient(commonName)},
-		RootCAs:      cg.GetRootCertificates(),
+		ClientCAs:    cg.GetRootCertificates(),
+		ClientAuth:   tls.RequireAndVerifyClientCert,
 	}
+	tlsConfig.BuildNameToCertificate()
+	return tlsConfig
 }
 
 //Get the generated root certificate
