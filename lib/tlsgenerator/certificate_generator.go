@@ -44,7 +44,7 @@ func (cg *CertificateGenerator) GetRootCertificates() *x509.CertPool {
 	return pool
 }
 
-func (cg *CertificateGenerator) NewClient(notBefore time.Time, ttl time.Duration) *CertificateGenerator {
+func NewClient(notBefore time.Time, ttl time.Duration) *CertificateGenerator {
 	client := &CertificateGenerator{
 		notBefore: notBefore,
 		notAfter:  notBefore.Add(ttl),
