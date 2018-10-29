@@ -4,8 +4,8 @@ import (
 	"fmt"
 	_ "github.com/heroku/x/hmetrics/onload"
 	"github.com/zerospam/check-firewall/lib/Handlers"
+	"github.com/zerospam/check-firewall/lib/common"
 	"net/http"
-	"os"
 )
 
 func init() {
@@ -14,11 +14,8 @@ func init() {
 }
 
 func main() {
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "80"
-	}
-	err := http.ListenAndServe(fmt.Sprintf(":%s", port), nil)
+
+	err := http.ListenAndServe(fmt.Sprintf(":%s", common.GetVars().ApplicationPort), nil)
 	if err != nil {
 		panic(err)
 	}
