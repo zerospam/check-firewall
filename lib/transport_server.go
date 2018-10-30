@@ -147,7 +147,7 @@ func (t *TransportServer) checkSMTP(conn net.Conn) (bool, string) {
 	}
 
 	if err = client.Rcpt(t.TestEmail); err != nil {
-		return true, fmt.Sprintf("[TLS %s] Stop at RCPT TO (TLS: %s)", tlsVersion, err)
+		return true, fmt.Sprintf("[TLS %s] Stop at RCPT TO [%s]", tlsVersion, err)
 	}
 
 	return false, fmt.Sprintf("[TLS %s] Can start a SMTP Transaction", tlsVersion)
