@@ -9,7 +9,6 @@ import (
 	"log"
 	"net"
 	"net/smtp"
-	"os"
 	"strings"
 	"time"
 )
@@ -116,11 +115,6 @@ func (t *TransportServer) CheckServer(checkSMTP bool) CheckResult {
 
 func (t *TransportServer) checkSMTP(conn net.Conn) (bool, string) {
 
-	hostname, err := os.Hostname()
-	if err != nil {
-		panic(err)
-	}
-
 	client, err := smtp.NewClient(conn, t.Server)
 	if err != nil {
 		return true, "Stop at INIT CONN"
@@ -129,7 +123,7 @@ func (t *TransportServer) checkSMTP(conn net.Conn) (bool, string) {
 	defer client.Quit()
 	defer client.Close()
 
-	if err = client.Hello(hostname); err != nil {
+	if err = client.Hello(common.GetVars().SmtpCN); err != nil {
 		return true, "Stop at EHLO"
 	}
 
