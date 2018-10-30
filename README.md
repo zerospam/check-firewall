@@ -22,7 +22,8 @@ An unaddressable server is considered a success.
 {
   "server": "example.com",
   "port": 25,
-  "mx": false
+  "mx": false,
+  "test_email": "test@example.com"
 }
 ```
 
@@ -32,6 +33,7 @@ An unaddressable server is considered a success.
 | server | Server to check                                                                |
 | port   | Port to use to attempt the connection                                          |
 | mx     | Instead of resolving the IP, resolve the MX of the server first then check IPs |
+| test_email     | Used as RCPT TO when doing SMTP checks |
 ## Result
 ### Success
 ```json
@@ -46,12 +48,14 @@ An unaddressable server is considered a success.
         {
             "server": "example.com",
             "ip": "0.0.0.0",
-            "result": true
+            "result": true,
+            "smtp_check_msg": ""
         },
         {
             "server": "example.com",
             "ip": "0.0.0.1",
-            "result": true
+            "result": true,
+            "smtp_check_msg": "[TLS VersionTLS12] Stop at RCPT TO"
         },
     ]
 }
@@ -73,12 +77,14 @@ An unaddressable server is considered a success.
         {
             "server": "example.com",
             "ip": "0.0.0.0",
-            "result": false
+            "result": false,
+            "smtp_check_msg": "[TLS VersionTLS12] Can start a SMTP Transaction"
         },
         {
             "server": "example.com",
             "ip": "0.0.0.1",
-            "result": false
+            "result": false,
+            "smtp_check_msg": "[TLS VersionTLS12] Can start a SMTP Transaction"
         },
     ]
 }
@@ -97,12 +103,14 @@ An unaddressable server is considered a success.
         {
             "server": "example.com",
             "ip": "0.0.0.0",
-            "result": false
+            "result": false,
+            "smtp_check_msg": "[TLS VersionTLS12] Can start a SMTP Transaction"
         },
         {
             "server": "example.com",
             "ip": "0.0.0.1",
-            "result": true
+            "result": true,
+            "smtp_check_msg": ""
         },
     ]
 }
