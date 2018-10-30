@@ -148,12 +148,12 @@ func (t *TransportServer) checkSMTP(conn net.Conn) (bool, string) {
 		tlsVersion = tlsgenerator.TlsVersion(state)
 	}
 
-	if err = client.Mail(common.GetVars().SmtpMailFrom.String()); err != nil {
-		return true, fmt.Sprintf("Stop at MAIL FROM (TLS: %s)", tlsVersion)
+	if err = client.Mail(common.GetVars().SmtpMailFrom.Address); err != nil {
+		return true, fmt.Sprintf("Stop at MAIL FROM (TLS: %s) [%s]", tlsVersion, err)
 	}
 
 	if err = client.Rcpt(t.TestEmail); err != nil {
-		return true, fmt.Sprintf("Stop at RCPT TO (TLS: %s)", tlsVersion)
+		return true, fmt.Sprintf("Stop at RCPT TO (TLS: %s) [%s]", tlsVersion, err)
 	}
 
 	return false, fmt.Sprintf("Can start a SMTP Transaction (TLS: %s)", tlsVersion)
