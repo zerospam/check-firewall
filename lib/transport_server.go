@@ -4,8 +4,8 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
-	"github.com/zerospam/check-firewall/lib/Common"
-	"github.com/zerospam/check-firewall/lib/tlsgenerator"
+	"github.com/zerospam/check-firewall/lib/environment-vars"
+	"github.com/zerospam/check-firewall/lib/tls-generator"
 	"log"
 	"net"
 	"net/smtp"
@@ -123,14 +123,14 @@ func (t *TransportServer) checkSMTP(conn net.Conn) (bool, string) {
 	defer client.Quit()
 	defer client.Close()
 
-	if err = client.Hello(Common.GetVars().SmtpCN); err != nil {
+	if err = client.Hello(environmentvars.GetVars().SmtpCN); err != nil {
 		return true, "Stop at EHLO"
 	}
 
 	var tlsVersion = "None"
 
 	if tlsSupport, _ := client.Extension("STARTTLS"); tlsSupport {
-		tlsConfig := t.getClientTLSConfig(Common.GetVars().SmtpCN)
+		tlsConfig := t.getClientTLSConfig(environmentvars.GetVars().SmtpCN)
 		tlsConfig.ServerName = t.Server
 		tlsConfig.MinVersion = tls.VersionTLS11
 		err = client.StartTLS(tlsConfig)
@@ -142,7 +142,7 @@ func (t *TransportServer) checkSMTP(conn net.Conn) (bool, string) {
 		tlsVersion = tlsgenerator.TlsVersion(state)
 	}
 
-	if err = client.Mail(Common.GetVars().SmtpMailFrom.Address); err != nil {
+	if err = client.Mail(environmentvars.GetVars().SmtpMailFrom.Address); err != nil {
 		return true, fmt.Sprintf("[TLS %s] Stop at MAIL FROM [%s]", tlsVersion, err)
 	}
 

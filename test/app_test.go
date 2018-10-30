@@ -3,7 +3,7 @@ package test
 import (
 	"github.com/stretchr/testify/assert"
 	"github.com/zerospam/check-firewall/lib"
-	"github.com/zerospam/check-firewall/lib/Handlers"
+	"github.com/zerospam/check-firewall/lib/handlers"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -33,7 +33,7 @@ func TestHealthz(t *testing.T) {
 
 	// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
 	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(Handlers.HealthCheck)
+	handler := http.HandlerFunc(handlers.HealthCheck)
 
 	// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
 	// directly and pass in our Request and ResponseRecorder.
