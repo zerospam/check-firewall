@@ -2,7 +2,7 @@ ARG APP_PACKAGE="github.com/zerospam/check-firewall"
 ARG APP_PATH="/go/src/${APP_PACKAGE}"
 ARG APP_NAME="firewallChecker"
 
-FROM golang:1.11.1-alpine as builder
+FROM zerospam/go-dep-docker as builder
 
 ENV CGO_ENABLED=0
 ENV GOOS=linux
@@ -10,10 +10,6 @@ ENV GOOS=linux
 ARG APP_PACKAGE
 ARG APP_PATH
 ARG APP_NAME
-
-RUN wget -O - https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-RUN sed -i -e 's/dl-cdn/dl-4/' /etc/apk/repositories && \
-    apk --update --no-cache add git
 
 COPY . $APP_PATH
 WORKDIR $APP_PATH
