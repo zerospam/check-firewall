@@ -115,3 +115,20 @@ An unaddressable server is considered a success.
     ]
 }
 ```
+
+#### Unknown host
+```json
+{
+  "request": {
+    "server": "mailcatcher",
+    "port": 25,
+    "mx": false,
+    "testEmail": "test@test.com"
+  },
+  "success": false,
+  "details": [
+    {}
+  ],
+  "errorMessage": "lookup mailcatcher on 127.0.0.1: no such host"
+}
+```
