@@ -2,7 +2,6 @@ package lib
 
 import (
 	"crypto/tls"
-	"errors"
 	"fmt"
 	"github.com/zerospam/check-firewall/lib/environment-vars"
 	"github.com/zerospam/check-firewall/lib/tls-generator"
@@ -51,7 +50,7 @@ func (t *TransportServer) getNames() (names []*NameIp, error error) {
 		mxRecords, errorMx := net.LookupMX(t.Server)
 
 		if errorMx != nil {
-			return nil, errorMx
+			return nil, fmt.Errorf("Can't get the MX of %s.\n%s", t.Server, errorMx)
 		}
 
 		for _, mx := range mxRecords {
@@ -79,7 +78,7 @@ func (t *TransportServer) getNames() (names []*NameIp, error error) {
 	}
 
 	if len(names) == 0 {
-		return nil, errors.New("can't find servers")
+		return nil, fmt.Errorf("can't find servers linked to %s", t.Server)
 	}
 
 	return names, nil
