@@ -14,6 +14,8 @@ func TlsVersion(state tls.ConnectionState) string {
 		return "VersionTLS11"
 	case tls.VersionTLS12:
 		return "VersionTLS12"
+	case tls.VersionTLS13:
+		return "VersionTLS13"
 	default:
 		return "Unknown TLS version"
 	}
